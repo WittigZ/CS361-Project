@@ -125,7 +125,7 @@ class TaskManager:
             # APPLY FILTERING
             filtered_tasks = []
             for task in self.tasks:
-                if current_filter == 'A':  # All tasks
+                if current_filter == 'N':  # All tasks
                     filtered_tasks.append(task)
                 elif current_filter == 'I' and not task['completed']:  # Incomplete only
                     filtered_tasks.append(task)
@@ -169,7 +169,7 @@ class TaskManager:
                 print(f"Now sorting by: {'Due Date' if choice == 'D' else 'Priority' if choice == 'P' else 'Title' if choice == 'T' else 'None'}")
             elif choice in ['A', 'I', 'C']:  # Filtering commands
                 current_filter = choice
-                print(f"Now showing: {'All tasks' if choice == 'A' else 'Incomplete only' if choice == 'I' else 'Completed only'}")
+                print(f"Now showing: {'All Tasks' if choice == 'N' else 'Incomplete only' if choice == 'I' else 'Completed only'}")
             elif choice.isdigit():
                 task_num = int(choice)
                 if 1 <= task_num <= len(filtered_tasks):
