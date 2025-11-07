@@ -94,15 +94,20 @@ class TaskManager:
             print("Failed to save task.")
     
     def view_tasks(self):
-        """View and manage tasks"""
+        """View and manage tasks - User Story: View Task List"""
+        current_sort = 'N'  # Default: No sorting
+        current_filter = 'A'  # Default: All tasks
+    
         while True:
             print("\n" + "="*50)
             print("MY TASKS")
             print("="*50)
-            print("SORT: (D)ue Date  (P)riority  (T)itle ")
-            print("FILTER: (N)o Filter  (I)ncomplete  (C)ompleted")
+        
+            # Show current sorting/filtering state
+            print(f"SORT: (D)ue Date  (P)riority  (T)itle  (N)one")
+            print(f"FILTER: (A)ll  (I)ncomplete  (C)ompleted")
             print("-"*50)
-            
+        
             if not self.tasks:
                 print("No tasks found. Add some tasks to get started!")
                 print("-"*50)
@@ -116,31 +121,64 @@ class TaskManager:
                 else:
                     print("Invalid choice. Please try again.")
                     continue
-            sorted_tasks = self.tasks.copy()
-            
+        
+            # APPLY FILTERING
+            filtered_tasks = []
+            for task in self.tasks:
+                if current_filter == 'A':  # All tasks
+                    filtered_tasks.append(task)
+                elif current_filter == 'I' and not task['completed']:  # Incomplete only
+                    filtered_tasks.append(task)
+                elif current_filter == 'C' and task['completed']:  # Completed only
+                    filtered_tasks.append(task)
+        
+            # APPLY SORTING
+            if current_sort == 'D':  # Due Date
+                filtered_tasks.sort(key=lambda x: (x['due_date'] or '9999-99-99'))
+            elif current_sort == 'P':  # Priority
+                priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
+                filtered_tasks.sort(key=lambda x: priority_order[x['priority']])
+            elif current_sort == 'T':  # Title
+                filtered_tasks.sort(key=lambda x: x['title'].lower())
+            # 'N' for None - no sorting applied
+        
+            # Display tasks
             print(f"{'#':<2} {'Status':<6} {'Task':<20} {'Due Date':<12} {'Priority':<8}")
             print("-"*50)
-            
-            for i, task in enumerate(sorted_tasks, 1):
+        
+            for i, task in enumerate(filtered_tasks, 1):
                 status = "✓" if task['completed'] else " "
                 due_date = task['due_date'] if task['due_date'] else "No date"
                 print(f"{i:<2} [{status}]   {task['title'][:18]:<18} {due_date:<12} {task['priority']:<8}")
-            
+        
             print("-"*50)
-
-            print("ACTIONS: (A)dd Task  (1-{})Toggle Complete  (E)dit  (B)ack".format(len(self.tasks)))
-            choice = input("\nEnter a command or task number: ").strip().upper()
-            
+            print(f"Showing {len(filtered_tasks)} task(s)")
+        
+            # Action menu
+            print("ACTIONS: (A)dd Task  (1-{})Toggle Complete  (E)dit  (B)ack".format(len(filtered_tasks)))
+            choice = input("\nEnter a command, task number, or S/F for sort/filter: ").strip().upper()
+        
             if choice == 'A':
                 self.add_new_task()
             elif choice == 'B':
                 break
             elif choice == 'E':
                 self.edit_task()
+            elif choice in ['D', 'P', 'T', 'N']:  # Sorting commands
+                current_sort = choice
+                print(f"Now sorting by: {'Due Date' if choice == 'D' else 'Priority' if choice == 'P' else 'Title' if choice == 'T' else 'None'}")
+            elif choice in ['A', 'I', 'C']:  # Filtering commands
+                current_filter = choice
+                print(f"Now showing: {'All tasks' if choice == 'A' else 'Incomplete only' if choice == 'I' else 'Completed only'}")
             elif choice.isdigit():
                 task_num = int(choice)
-                if 1 <= task_num <= len(self.tasks):
-                    self.toggle_task_complete(task_num)
+                if 1 <= task_num <= len(filtered_tasks):
+                    # Find the actual task in the main list using the filtered task's title/ID
+                    filtered_task = filtered_tasks[task_num - 1]
+                    for idx, main_task in enumerate(self.tasks):
+                        if main_task['id'] == filtered_task['id']:
+                            self.toggle_task_complete(idx + 1)
+                            break
                 else:
                     print("Invalid task number.")
             else:
