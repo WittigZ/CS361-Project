@@ -96,7 +96,7 @@ class TaskManager:
     def view_tasks(self):
         """View and manage tasks - User Story: View Task List"""
         current_sort = 'N'  # Default: No sorting
-        current_filter = 'A'  # Default: All tasks
+        current_filter = 'N'  # Default: All tasks
     
         while True:
             print("\n" + "="*50)
@@ -104,8 +104,8 @@ class TaskManager:
             print("="*50)
         
             # Show current sorting/filtering state
-            print(f"SORT: (D)ue Date  (P)riority  (T)itle  (N)one")
-            print(f"FILTER: (A)ll  (I)ncomplete  (C)ompleted")
+            print(f"SORT: (D)ue Date  (P)riority  (T)itle")
+            print(f"FILTER: (N)o Filter  (I)ncomplete  (C)ompleted")
             print("-"*50)
         
             if not self.tasks:
@@ -164,10 +164,10 @@ class TaskManager:
                 break
             elif choice == 'E':
                 self.edit_task()
-            elif choice in ['D', 'P', 'T', 'N']:  # Sorting commands
+            elif choice in ['D', 'P', 'T']:  # Sorting commands
                 current_sort = choice
                 print(f"Now sorting by: {'Due Date' if choice == 'D' else 'Priority' if choice == 'P' else 'Title' if choice == 'T' else 'None'}")
-            elif choice in ['A', 'I', 'C']:  # Filtering commands
+            elif choice in ['N', 'I', 'C']:  # Filtering commands
                 current_filter = choice
                 print(f"Now showing: {'All Tasks' if choice == 'N' else 'Incomplete only' if choice == 'I' else 'Completed only'}")
             elif choice.isdigit():
